@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.envrc
+campaign_state.json
+content_queue/
+oppo_data/
+voice_profile/
+opponent_watch/
+sentiment_data/
+donor_data/
+*.csv

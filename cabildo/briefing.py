@@ -9,14 +9,22 @@ from datetime import date
 
 from .campaign import CampaignState, daily_briefing
 from .compliance import california_filing_deadlines
+from .donor_score import DonorTracker
+from .opponent_watch import OpponentWatcher
 from .oppo import OppoResearch
+from .sentiment import SentimentMonitor
 from .social import ContentQueue
+from .voice_profile import VoiceProfile
 
 
 def full_briefing(state: CampaignState,
                   oppo: OppoResearch | None = None,
-                  content: ContentQueue | None = None) -> str:
-    """Generate the complete morning briefing."""
+                  content: ContentQueue | None = None,
+                  opponent: OpponentWatcher | None = None,
+                  sentiment: SentimentMonitor | None = None,
+                  donors: DonorTracker | None = None,
+                  voice: VoiceProfile | None = None) -> str:
+    """Generate the complete morning briefing — all systems."""
     sections = [daily_briefing(state)]
 
     deadlines = california_filing_deadlines(state.config.election_date)
@@ -32,9 +40,21 @@ def full_briefing(state: CampaignState,
             days = (date.fromisoformat(d["due"]) - date.today()).days
             sections.append(f"  - {d['name']}: {d['due']} ({days} days)")
 
+    if opponent:
+        sections.append("")
+        sections.append(opponent.briefing())
+
+    if sentiment:
+        sections.append("")
+        sections.append(sentiment.briefing())
+
     if oppo and oppo.findings:
         sections.append("")
         sections.append(oppo.briefing())
+
+    if donors:
+        sections.append("")
+        sections.append(donors.call_list_briefing(5))
 
     if content:
         sections.append("")
@@ -42,6 +62,10 @@ def full_briefing(state: CampaignState,
         pending = content.pending()
         if pending:
             sections.append(f"  {len(pending)} posts awaiting your review")
+
+    if voice:
+        sections.append("")
+        sections.append(voice.summary())
 
     sections.append("")
     sections.append("---")
