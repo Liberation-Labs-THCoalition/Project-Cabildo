@@ -71,7 +71,11 @@ class CampaignState:
         p = Path(path)
         if not p.exists():
             return cls()
-        data = json.loads(p.read_text())
+        try:
+            data = json.loads(p.read_text())
+        except (json.JSONDecodeError, ValueError):
+            logger.warning("Corrupted state file %s — starting fresh", path)
+            return cls()
         state = cls()
         state.doors_knocked = data.get("doors_knocked", 0)
         state.doors_target = data.get("doors_target", 2000)

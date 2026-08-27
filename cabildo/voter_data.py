@@ -40,13 +40,17 @@ class NationBuilderClient:
         self.base_url = f"https://{slug}.nationbuilder.com/api/v1"
         self.token = token
 
-    def _get(self, endpoint: str, params: str = "") -> dict:
+    def _get(self, endpoint: str, params: dict | None = None) -> dict:
+        from urllib.parse import urlencode
+        query = params or {}
+        query["access_token"] = self.token
         sep = "&" if "?" in endpoint else "?"
-        url = f"{self.base_url}{endpoint}{sep}access_token={self.token}"
-        if params:
-            url += f"&{params}"
+        url = f"{self.base_url}{endpoint}{sep}{urlencode(query)}"
         try:
-            req = Request(url, headers={"Accept": "application/json"})
+            req = Request(url, headers={
+                "Accept": "application/json",
+                "Authorization": f"Bearer {self.token}",
+            })
             with urlopen(req, timeout=15) as resp:
                 return json.loads(resp.read())
         except (URLError, json.JSONDecodeError) as e:
@@ -58,7 +62,7 @@ class NationBuilderClient:
         return data.get("results", [])
 
     def search_people(self, query: str) -> list[dict]:
-        data = self._get(f"/people/search?name={query}")
+        data = self._get("/people/search", {"name": query})
         return data.get("results", [])
 
     def get_person(self, person_id: int) -> dict:
