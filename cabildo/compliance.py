@@ -19,6 +19,8 @@ class ComplianceCheck:
     detail: str = ""
 
 
+from .ontology import CampaignOntology
+
 ETHICS_RULES = [
     "AI disclosure: all AI-generated voter-facing content must include disclosure",
     "No impersonation: AI must not pretend to be the candidate",
@@ -28,6 +30,43 @@ ETHICS_RULES = [
     "Public records only: opposition research uses only publicly available data",
     "Audit trail: all AI-generated communications are logged",
 ]
+
+
+def ontology_check(action: str, role: str = "ai_agent",
+                   ontology: CampaignOntology | None = None) -> list[ComplianceCheck]:
+    """Run ontology-driven compliance checks on a proposed action."""
+    ont = ontology or CampaignOntology()
+    violations = ont.validate_action(action, role)
+    constraints = ont.constraints_for(action)
+    workflow = ont.workflow_for(action)
+
+    checks = []
+    for constraint in constraints:
+        passed = constraint.name not in [v.split(":")[0] for v in violations]
+        checks.append(ComplianceCheck(
+            rule=constraint.description,
+            passed=True,
+            detail=f"Ontology constraint: {constraint.name}",
+        ))
+
+    for v in violations:
+        checks.append(ComplianceCheck(
+            rule=v,
+            passed=False,
+            detail="Ontology violation",
+        ))
+
+    if workflow:
+        steps = workflow.properties.get("steps", "")
+        gate = workflow.properties.get("gate", "")
+        gate_role = workflow.properties.get("gate_role", "")
+        checks.append(ComplianceCheck(
+            rule=f"Workflow: {steps}",
+            passed=True,
+            detail=f"Gate at '{gate}' requires '{gate_role}'" if gate else "",
+        ))
+
+    return checks
 
 
 def check_content(content: str, candidate_name: str = "") -> list[ComplianceCheck]:

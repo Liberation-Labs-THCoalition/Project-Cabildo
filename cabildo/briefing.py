@@ -10,6 +10,7 @@ from datetime import date
 from .campaign import CampaignState, daily_briefing
 from .compliance import california_filing_deadlines
 from .donor_score import DonorTracker
+from .ontology import CampaignOntology
 from .opponent_watch import OpponentWatcher
 from .oppo import OppoResearch
 from .sentiment import SentimentMonitor
