@@ -44,10 +44,10 @@ print(full_briefing(state))
 
 ## Architecture
 
-Built on the [Kintsugi](https://github.com/Liberation-Labs-THCoalition/Project-Kintsugi) scaffold engine:
-- **BDI goal tracking** for campaign milestones
-- **BoundaryGuardian** pattern for ethics enforcement
-- **SkillDomain** modules for each campaign function
+Designed alongside the [Kintsugi](https://github.com/Liberation-Labs-THCoalition/Project-Kintsugi) scaffold engine and modelled on its patterns, in Cabildo's own code. It imports nothing from Kintsugi:
+- **Milestone tracking and a daily briefing** (`campaign.py`), framed as BDI but without Kintsugi's BDI store
+- **Content and election-law checks** after Kintsugi's BoundaryGuardian pattern (`compliance.py`); nothing in the package calls `check_content()` or `ontology_check()` yet
+- **One module per campaign function** (canvassing, social media, opposition research and so on), as plain Python rather than Kintsugi SkillDomain chips
 
 Connects to:
 - NationBuilder API v1 (voter data, events, donations)

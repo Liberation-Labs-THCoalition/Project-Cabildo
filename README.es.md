@@ -44,10 +44,10 @@ print(full_briefing(state))
 
 ## Arquitectura
 
-Construido sobre el motor de scaffold [Kintsugi](https://github.com/Liberation-Labs-THCoalition/Project-Kintsugi):
-- **Seguimiento de metas BDI** para hitos de campana
-- **Patron BoundaryGuardian** para hacer cumplir la etica
-- **Modulos SkillDomain** para cada funcion de campana
+Disenado junto al motor de scaffold [Kintsugi](https://github.com/Liberation-Labs-THCoalition/Project-Kintsugi) y siguiendo sus patrones, con codigo propio de Cabildo. No importa nada de Kintsugi:
+- **Seguimiento de hitos y un resumen diario** (`campaign.py`), planteado como BDI pero sin el almacen BDI de Kintsugi
+- **Revision de contenido y de ley electoral** segun el patron BoundaryGuardian de Kintsugi (`compliance.py`); nada en el paquete llama todavia a `check_content()` ni a `ontology_check()`
+- **Un modulo por funcion de campana** (puerta a puerta, redes sociales, investigacion de la oposicion, etc.), en Python simple y no como chips SkillDomain de Kintsugi
 
 Se conecta con:
 - NationBuilder API v1 (datos de votantes, eventos, donaciones)
